@@ -1,8 +1,6 @@
-fastapi[standard]
 fastapi
 uvicorn
 numpy
 joblib
 scikit-learn
-fastapi.middleware.cors
-shap
+
