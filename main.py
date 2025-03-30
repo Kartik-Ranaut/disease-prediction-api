@@ -2,9 +2,17 @@ from fastapi import FastAPI
 from pydantic import BaseModel
 import joblib
 import numpy as np
+from fastapi.middleware.cors import CORSMiddleware
+
 
 app = FastAPI()
-
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # Allow all origins (change to specific domain for security)
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 #define a route at root web address('/')
 @app.get('/')
 def read():
@@ -61,8 +69,11 @@ def predict(data: ModelInput):
 # Make prediction
     prediction = model.predict(input_features).tolist()
 
-    return {"prediction": prediction}
-
+    probability = model.predict_proba(input_features)[0][1]
+    return {
+            "prediction": prediction,  # Ensure it's an integer
+            "probability": round(probability * 100, 2)  # Convert to percentage with 2 decimal places
+        }
 
 # Load the trained model
 modeld = joblib.load("modeld.sav")
@@ -95,7 +106,9 @@ def predict(data: ModelInput):
 
 # Make prediction
     prediction = modeld.predict(input_features).tolist()
-
-    return {"prediction": prediction}
-
+    probability = modeld.predict_proba(input_features)[0][1]
+    return {
+            "prediction": prediction,  # Ensure it's an integer
+            "probability": round(probability * 100, 2)  # Convert to percentage with 2 decimal places
+        }
 
